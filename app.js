@@ -1,5 +1,4 @@
 import Node from "./node.js";
-import prettyPrint from "./prettyPrint.js";
 
 
 class Tree {
@@ -9,13 +8,13 @@ class Tree {
 
     rebuildArray(arr) {
         let sorted = [...new Set(arr)].sort((a, b) => a - b);
-        return sorted
+        return sorted;
     }
 
     buildTree(arr) {
         let sorted = this.rebuildArray(arr);
         if(sorted.length === 0) return null;
-        //remove duplications and sort 
+
         let mid = parseInt((sorted.length)/2);
         let node = new Node(sorted[mid]);
         node.left = this.buildTree(sorted.slice(0, mid));
@@ -58,19 +57,15 @@ class Tree {
     deleteFn(value, root) {
         if(root === null) return root;
 
-        //if value is lower than data find on left side
         if(root.data > value) {
             root.left = this.deleteFn(value, root.left);
         }
 
-        //if value is bigger than data find on right side
         if(root.data < value) {
             root.right = this.deleteFn(value, root.right);
         }
 
-        //if the value is data delete
         if(root.data === value) {
-            //if the subtree has one or zero children
             if(root.left === null) {
                 return root.right;
             }
@@ -78,8 +73,6 @@ class Tree {
             if(root.right === null) {
                 return root.left;
             }
-
-            //if the subtree has two children
 
             let parent = root;
             let succ = root.right;
@@ -160,16 +153,38 @@ class Tree {
 
     height(node = this.root) {
         if(node === null) return -1;
-
-        const leftHeight = this.height(node.left);
-        const rightHeight = this.height(node.right);
+        
+        let leftHeight = this.height(node.left);
+        let rightHeight = this.height(node.right);
 
         return Math.max(leftHeight, rightHeight) + 1;
     }
+
+    depth(node, root = this.root, count = 0) {
+        if(root === null) return 0;
+        if(root.data === node.data) return count;
+        if(root.data > node.data) {
+            return this.depth(node, root.left, count + 1);
+        } else {
+            return this.depth(node, root.right, count + 1);
+        }
+    }
+
+    isBalanced(node = this.root) {
+        if(node === null) return true;
+        let difference = Math.abs(this.height(node.left) - this.height(node.right));
+        if(difference <= 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    rebalance() {
+        if(this.root === null) return;
+        let sortedArray = this.rebuildArray(this.inorder());
+        this.root = this.buildTree(sortedArray);
+    }
 }
 
-let tree = new Tree([6,2,6,3,7,90,10,4]) //1,2,3,6,7,10,90
-tree.insert(1);
-tree.insert(5);
-console.log(prettyPrint(tree.root));
-console.log(tree.height());
+export default Tree;
